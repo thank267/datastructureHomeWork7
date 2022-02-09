@@ -2,14 +2,14 @@ package lesson7;
 
 import java.util.*;
 
-public class GraphImpl implements Graph {
+public class WeightedGraphImpl implements Graph {
 
     private final List<Vertex> vertexList;
-    private final boolean[][] adjMatrix;
+    private final Integer[][] adjMatrix;
 
-    public GraphImpl(int maxVertexCount) {
+    public WeightedGraphImpl(int maxVertexCount) {
         this.vertexList = new ArrayList<>(maxVertexCount);
-        this.adjMatrix = new boolean[maxVertexCount][maxVertexCount];
+        this.adjMatrix = new Integer[maxVertexCount][maxVertexCount];
     }
 
 
@@ -19,7 +19,7 @@ public class GraphImpl implements Graph {
     }
 
     @Override
-    public boolean addEdge(String startLabel, String secondLabel) {
+    public boolean addEdge(String startLabel, String secondLabel, Integer weight) {
         int startIndex = indexOf(startLabel);
         int endIndex = indexOf(secondLabel);
 
@@ -27,14 +27,9 @@ public class GraphImpl implements Graph {
             return false;
         }
 
-        adjMatrix[startIndex][endIndex] = true; //!!!!!!!!!!!!
+        adjMatrix[startIndex][endIndex] = weight; //!!!!!!!!!!!!
 
         return true;
-    }
-
-    @Override
-    public boolean addEdge(String startLabel, String secondLabel, Integer weight) {
-       return false;
     }
 
     private int indexOf(String label) {
@@ -48,13 +43,12 @@ public class GraphImpl implements Graph {
 
     @Override
     public boolean addEdge(String startLabel, String secondLabel, String... others) {
-        boolean result = addEdge(startLabel, secondLabel);
+        return false;
+    }
 
-        for (String other : others) {
-            result &= addEdge(startLabel, other);
-        }
-
-        return result;
+    @Override
+    public boolean addEdge(String startLabel, String secondLabel) {
+        return false;
     }
 
     @Override
@@ -74,7 +68,7 @@ public class GraphImpl implements Graph {
         for (int i = 0; i < getSize(); i++) {
             sb.append(vertexList.get(i));
             for (int j = 0; j < getSize(); j++) {
-                if (adjMatrix[i][j]) {
+                if (Objects.nonNull(adjMatrix[i][j])) {
                     sb.append(" -> ").append(vertexList.get(j));
                 }
             }
@@ -106,15 +100,83 @@ public class GraphImpl implements Graph {
         System.out.println();
     }
 
+    public void dijkstra(String startLabel, String endLabel) {
+
+        int startIndex = indexOf(startLabel);
+
+        if (startIndex == -1) {
+            throw new IllegalArgumentException("Неверная вершина" + startLabel);
+        }
+        Vertex source = vertexList.get(startIndex);
+
+        source.setDistance(0);
+
+        Set<Vertex> settledVertexes = new HashSet<>();
+        Set<Vertex> unsettledVertexes = new HashSet<>();
+
+        unsettledVertexes.add(source);
+
+        while (unsettledVertexes.size() != 0) {
+            Vertex currentVertex = getLowestDistanceVertex(unsettledVertexes);
+            unsettledVertexes.remove(currentVertex);
+            for (int i = 0; i < getSize(); i++) {
+                Vertex evaluationVertex = vertexList.get(i);
+
+                Integer edgeWeight = adjMatrix[vertexList.indexOf(currentVertex)][i];
+                if (Objects.nonNull(edgeWeight) && !settledVertexes.contains(evaluationVertex)) {
+                    calculateMinimumDistance(evaluationVertex, edgeWeight, currentVertex);
+                    unsettledVertexes.add(evaluationVertex);
+                }
+            }
+            settledVertexes.add(currentVertex);
+        }
+
+        int endIndex = indexOf(endLabel);
+
+        if (endIndex == -1) {
+            throw new IllegalArgumentException("Неверная вершина" + startLabel);
+        }
+        Vertex result = vertexList.get(endIndex);
+
+        System.out.println(result.getShortestPath());
+        System.out.println(result.getDistance());
+    }
+
     private Vertex getNearUnvisitedVertex(Vertex vertex) {
         int currentIndex = vertexList.indexOf(vertex);
         for (int i = 0; i < getSize(); i++) {
-            if (adjMatrix[currentIndex][i] && !vertexList.get(i).isVisited() ) {
+            if (Objects.nonNull(adjMatrix[currentIndex][i]) && !vertexList.get(i).isVisited() ) {
                 return vertexList.get(i);
             }
         }
 
         return null;
+    }
+
+    private Vertex getLowestDistanceVertex(Set<Vertex> unsettledVertexes) {
+        Vertex lowestDistanceVertex = null;
+        int lowestDistance = Integer.MAX_VALUE;
+        for (Vertex vertex: unsettledVertexes) {
+            int vertexDistance = vertex.getDistance();
+            if (vertexDistance < lowestDistance) {
+                lowestDistance = vertexDistance;
+                lowestDistanceVertex = vertex;
+            }
+
+        }
+        return lowestDistanceVertex;
+    }
+
+    private void calculateMinimumDistance(Vertex evaluationVertex,
+                                                 Integer edgeWeigh, Vertex sourceVertex) {
+
+        Integer sourceDistance = sourceVertex.getDistance();
+        if (sourceDistance + edgeWeigh < evaluationVertex.getDistance()) {
+            evaluationVertex.setDistance(sourceDistance + edgeWeigh);
+            LinkedList<Vertex> shortestPath = new LinkedList<>(sourceVertex.getShortestPath());
+            shortestPath.add(sourceVertex);
+            evaluationVertex.setShortestPath(shortestPath);
+        }
     }
 
     private void visitVertex(Stack<Vertex> stack, Vertex vertex) {

@@ -2,27 +2,46 @@ package lesson7;
 
 public class Main {
     public static void main(String[] args) {
-//        testGraph();
+        testGraph();
 //        testDfs();
-        testBfs();
+        //testBfs();
     }
 
     private static void testGraph() {
 
-        Graph graph = new GraphImpl(7);
+        WeightedGraphImpl graph = new WeightedGraphImpl(10);
 
-        graph.addVertex("A");
-        graph.addVertex("B");
-        graph.addVertex("C");
-        graph.addVertex("D");
+        graph.addVertex("Москва");
+        graph.addVertex("Тула");
+        graph.addVertex("Рязань");
+        graph.addVertex("Калуга");
+        graph.addVertex("Липецк");
+        graph.addVertex("Тамбов");
+        graph.addVertex("Орел");
+        graph.addVertex("Саратов");
+        graph.addVertex("Курск");
+        graph.addVertex("Воронеж");
 
-        graph.addEdge("A", "B", "C");
-        graph.addEdge("B", "C", "D");
-        graph.addEdge("C", "A", "B", "D");
-        graph.addEdge("D", "B", "C");
+        graph.addEdge("Москва", "Тула", 1);
+        graph.addEdge("Москва", "Рязань", 2);
+        graph.addEdge("Москва", "Калуга", 3);
+        graph.addEdge("Тула", "Липецк", 4);
+        graph.addEdge("Тула", "Саратов", 1);
+        graph.addEdge("Рязань", "Тамбов", 5);
+        graph.addEdge("Рязань", "Курск", 2);
+        graph.addEdge("Калуга", "Орел", 6);
+        graph.addEdge("Тамбов", "Саратов", 7);
+        graph.addEdge("Орел", "Курск", 8);
+        graph.addEdge("Липецк", "Воронеж", 9);
+        graph.addEdge("Саратов", "Воронеж", 10);
+        graph.addEdge("Курс", "Воронеж", 11);
 
         System.out.println("Size of graph is " + graph.getSize());
         graph.display();
+        graph.dijkstra("Москва","Воронеж");
+
+
+
     }
 
     private static void testDfs() {

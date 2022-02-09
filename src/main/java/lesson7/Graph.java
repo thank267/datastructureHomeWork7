@@ -6,6 +6,7 @@ public interface Graph {
 
     boolean addEdge(String startLabel, String secondLabel, String... others);
     boolean addEdge(String startLabel, String secondLabel);
+    boolean addEdge(String startLabel, String secondLabel, Integer weight);
 
     int getSize();
 

@@ -1,10 +1,32 @@
 package lesson7;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class Vertex {
     private final String label;
     private boolean isVisited;
+
+    public List<Vertex> getShortestPath() {
+        return shortestPath;
+    }
+
+    public void setShortestPath(List<Vertex> shortestPath) {
+        this.shortestPath = shortestPath;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Integer distance) {
+        this.distance = distance;
+    }
+
+    private List<Vertex> shortestPath = new LinkedList<>();
+
+    private Integer distance = Integer.MAX_VALUE;
 
     public boolean isVisited() {
         return isVisited;
